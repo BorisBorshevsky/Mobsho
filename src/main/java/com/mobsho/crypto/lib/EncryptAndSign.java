@@ -7,7 +7,7 @@ public class EncryptAndSign {
 
     ChipherImpl ChiperHandler;
     DigitalSignatureImpl digitalSignatureHandler;
-    KeyStoreHandler keyStoreHandler;
+    KeyStoreHelper keyStoreHelper;
     String cipherAlgorithm;
     String cipherProvider;
     String signatureAlgorithm;
@@ -17,7 +17,7 @@ public class EncryptAndSign {
     public EncryptAndSign(String keyStoreFilename, String keyStorePassword, String[] values) {
         this.ChiperHandler = new ChipherImpl();
         this.digitalSignatureHandler = new DigitalSignatureImpl();
-        this.keyStoreHandler = new KeyStoreHandler(keyStoreFilename, keyStorePassword);
+        this.keyStoreHelper = new KeyStoreHelper(keyStoreFilename, keyStorePassword);
         this.algorithmValues = values;
     }
 
@@ -27,10 +27,10 @@ public class EncryptAndSign {
         try {
             //Load keys - 1st for asymetric encryption, 2nd for asymetric digital signing
             //Load the other side's asymetric public key
-            PublicKey theirPublicKey = keyStoreHandler.getPublicKey(theirPublicKeyAlias);
+            PublicKey theirPublicKey = keyStoreHelper.getPublicKey(theirPublicKeyAlias);
 
             //Load my asymetric private key for digital signature
-            Key myAsymetricPrivateKey = keyStoreHandler.getPrivateKey(myPrivateKeyAlias, myPrivateKeyPassword);
+            Key myAsymetricPrivateKey = keyStoreHelper.getPrivateKey(myPrivateKeyAlias);
 
 
             //Encrypt file "inputFileName" content and save in "EncryptedData". Save encryption configuration in "configFile".

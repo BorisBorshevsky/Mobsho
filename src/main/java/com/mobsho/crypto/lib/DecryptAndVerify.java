@@ -7,12 +7,13 @@ public class DecryptAndVerify {
 
 	ChipherImpl ChiperHandler;
 	DigitalSignatureImpl digitalSignatureHandler;
-	KeyStoreHandler keyStoreHandler;
-	
+	KeyStoreHelper keyStoreHelper;
+
+
 	public DecryptAndVerify(String keyStoreFilename, String keyStorePassword) {
 		this.ChiperHandler = new ChipherImpl();
 		this.digitalSignatureHandler = new DigitalSignatureImpl();
-		this.keyStoreHandler = new KeyStoreHandler(keyStoreFilename, keyStorePassword);
+		this.keyStoreHelper = new KeyStoreHelper(keyStoreFilename, keyStorePassword);
 	}
 	
 
@@ -27,9 +28,9 @@ public class DecryptAndVerify {
 		try {
 			//Load keys:
 			//Load my asymetric private key for decryption
-			Key myAsymetricPrivateKey = keyStoreHandler.getPrivateKey(myPrivateKeyAlias, myPrivateKeyPassword);
+			Key myAsymetricPrivateKey = keyStoreHelper.getPrivateKey(myPrivateKeyAlias);
 			//Load the other side's asymetric public key for digital verifcation
-			PublicKey theirPublicKey = keyStoreHandler.getPublicKey(theirPublicKeyAlias);
+			PublicKey theirPublicKey = keyStoreHelper.getPublicKey(theirPublicKeyAlias);
 			
 			//Extract parameters from the XML configuration file
         	XMLhandler xmlhandler = new XMLhandler(null, null, null);
