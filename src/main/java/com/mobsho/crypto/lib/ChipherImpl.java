@@ -80,7 +80,7 @@ public class ChipherImpl {
 		Cipher c1;
 		try {
 			//Encrypt the private key using the other side public key
-			c1 = Cipher.getInstance("DES");
+			c1 = Cipher.getInstance("RSA");
 			byte[] encodedKey = sKey.getEncoded();
 			c1.init(Cipher.ENCRYPT_MODE, pubKey);
 			byte[] encryptedKey = c1.doFinal(encodedKey);

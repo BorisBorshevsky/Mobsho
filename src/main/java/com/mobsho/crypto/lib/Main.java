@@ -12,7 +12,24 @@ public class Main {
      */
 
 
+
     public static void main(String[] args) throws Exception{
+        ArrayList<String> argsSend = new ArrayList<String>();
+        argsSend.add("receive");
+        argsSend.add("data.enc");
+        argsSend.add("B/storeB.jks");
+        argsSend.add("passwordB");
+        argsSend.add("keyB");
+        argsSend.add("passwordB");
+        argsSend.add("keyA");
+
+        String[] stockArr = new String[argsSend.size()];
+        stockArr = argsSend.toArray(stockArr);
+
+        main2(stockArr);
+    }
+
+    public static void mainSend(String[] args) throws Exception{
         ArrayList<String> argsSend = new ArrayList<String>();
         argsSend.add("send");
         argsSend.add("data.txt");
