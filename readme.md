@@ -24,8 +24,8 @@ keytool -importcert -keystore storeA.jks -storepass passwordA -file certB.cer -a
 `mvn install`
 
 ## encrypt command
-`java -jar target/crypto-1.0-SNAPSHOT.jar encrypt data.txt A/storeA.jks keyA passwordA keyB`
+`java -jar target/crypto-1.0-SNAPSHOT.jar encrypt data.txt encrypedData.txt A/storeA.jks keyA passwordA keyB`
 
 ## decrypt commnad
-`java -jar target/crypto-1.0-SNAPSHOT.jar decrypt data1.enc B/storeB.jks keyB passwordB keyA
+`java -jar target/crypto-1.0-SNAPSHOT.jar decrypt encrypedData.txt decryptedData.txt B/storeB.jks keyB passwordB keyA
 `
