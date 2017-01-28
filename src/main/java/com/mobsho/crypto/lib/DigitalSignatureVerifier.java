@@ -2,11 +2,13 @@ package com.mobsho.crypto.lib;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.security.*;
+import java.security.PublicKey;
+import java.security.Signature;
+
+import static com.mobsho.crypto.lib.DigitalSigner.DEFAULT_SIGNATURE_ALGO;
 
 /**
- * Created by boris on 1/28/17.
+ * Created by boris on 1/26/17.
  */
 class DigitalSignatureVerifier {
 
@@ -14,23 +16,23 @@ class DigitalSignatureVerifier {
         //Initialize the Signature Object for Verification
         Signature sig;
         //Get a Signature Object
-        sig = Signature.getInstance("SHA1withRSA");
+        sig = Signature.getInstance(DEFAULT_SIGNATURE_ALGO);
         sig.initVerify(theirPublicKey);
 
         //Verify the Signature
         //Supply the Signature Object With the Data to be Verified
-        FileInputStream datafis = new FileInputStream(inputFile);
-        BufferedInputStream bufin = new BufferedInputStream(datafis);
+        FileInputStream dataFis = new FileInputStream(inputFile);
+        BufferedInputStream bufferedIs = new BufferedInputStream(dataFis);
 
         byte[] buffer = new byte[1024];
         int len;
-        while (bufin.available() != 0) {
-            len = bufin.read(buffer);
+        while (bufferedIs.available() != 0) {
+            len = bufferedIs.read(buffer);
             sig.update(buffer, 0, len);
         }
 
-        bufin.close();
-        datafis.close();
+        bufferedIs.close();
+        dataFis.close();
 
         //Verify the Signature
         boolean verifies = sig.verify(signature);

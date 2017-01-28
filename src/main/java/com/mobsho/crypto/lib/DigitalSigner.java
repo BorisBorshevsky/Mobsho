@@ -2,15 +2,12 @@ package com.mobsho.crypto.lib;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.Optional;
 
 /**
- * Created by boris on 1/28/17.
+ * Created by boris on 1/26/17.
  */
 class DigitalSigner {
     public static final String DEFAULT_SIGNATURE_ALGO = "SHA1withRSA";
@@ -23,9 +20,7 @@ class DigitalSigner {
 
     private DigitalSigner(Optional<String> signAlgorithm, Optional<String> signProvider) {
         this.signAlgorithm = signAlgorithm.orElse(DEFAULT_SIGNATURE_ALGO);
-        if (signProvider.isPresent()) {
-            this.signProvider = signProvider.get();
-        }
+        signProvider.ifPresent(s -> this.signProvider = s);
     }
 
     public byte[] sign(String inputFile, PrivateKey privateKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException {

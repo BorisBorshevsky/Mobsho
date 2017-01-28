@@ -1,33 +1,31 @@
 package com.mobsho.crypto.lib;
 
-import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import java.security.*;
-import java.util.Optional;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
- * Created by boris on 1/28/17.
+ * Created by boris on 1/26/17.
  */
 public class EncryptionProcessContext {
-    Cipher cipher;
-    PublicKey theirPublicKey;
-    PrivateKey myPrivateKey;
-    private Optional<IvParameterSpec> iv;
+    final Cipher cipher;
+    final PublicKey theirPublicKey;
+    final PrivateKey myPrivateKey;
     byte[] signature;
 
     public void setSignature(byte[] signature) {
         this.signature = signature;
     }
 
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
 
 
 
-    public EncryptionProcessContext(Cipher cipher, PublicKey theirPublicKey, PrivateKey myPrivateKey, SecretKey secretKey, Optional<IvParameterSpec> iv) {
+    public EncryptionProcessContext(Cipher cipher, PublicKey theirPublicKey, PrivateKey myPrivateKey, SecretKey secretKey) {
         this.cipher = cipher;
         this.theirPublicKey = theirPublicKey;
         this.myPrivateKey = myPrivateKey;
-        this.iv = iv;
         this.secretKey = secretKey;
     }
 

@@ -1,13 +1,14 @@
 package com.mobsho.crypto.lib;
 
-import org.xml.sax.SAXException;
-
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.*;
-import java.security.cert.CertificateException;
 
 
 class Decryptor {
@@ -21,17 +22,14 @@ class Decryptor {
 
 
     public void DecryptAndVerifyFile(String encryptedFileName, String outputFile, String myPrivateKeyAlias, String theirPublicKeyAlias) throws Exception {
-
         PrivateKey myPrivateKey = keyStoreHelper.getPrivateKey(myPrivateKeyAlias);
         PublicKey theirPublicKey = keyStoreHelper.getPublicKey(theirPublicKeyAlias);
 
-
         //Extract parameters from the XML configuration file
         ConfigurationManager configManager = new ConfigurationManager();
-        configManager.parseConfigurationFile();
+        configManager.parseFile();
         byte[] encodedAlgorithmParameters = configManager.getAlgorithmParameters();
         byte[] encryptedSecretKey = configManager.getEncryptedSecretKey();
-//
 
         //Decrypt/extract private key
         byte[] secretKeyBytes = Utils.DecryptRsa(encryptedSecretKey, myPrivateKey);
@@ -77,14 +75,9 @@ class Decryptor {
             }
         } finally {
             if (fis != null) fis.close();
-            if (fos != null)fos.close();
-            if (cis != null)cis.close();
+            if (fos != null) fos.close();
+            if (cis != null) cis.close();
 
         }
-        //Close resources
-
-
     }
-
-
 }

@@ -1,8 +1,9 @@
 package com.mobsho.crypto.lib;
 
 import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.util.Optional;
@@ -37,16 +38,15 @@ class Encryptor {
         SecureRandom secRandCipher = SecureRandom.getInstance("SHA1PRNG");
         secRandCipher.setSeed(1024);
         myCipher.init(Cipher.ENCRYPT_MODE, aesKey, secRandCipher);
-        return new EncryptionProcessContext(myCipher, theirPublicKey, myPrivateKey, aesKey, Optional.empty());
+        return new EncryptionProcessContext(myCipher, theirPublicKey, myPrivateKey, aesKey);
     }
 
 
-    public EncryptionProcessContext EncryptFile(String fileToEncrypt, OutputStream output, String myPrivateKeyAlias, String theirPublicKeyAlias, Optional<String> cipherProvider, Optional<String> cipherAlgorithm) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, NoSuchPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException {
+    public EncryptionProcessContext EncryptFile(String fileToEncrypt, OutputStream output, String myPrivateKeyAlias, String theirPublicKeyAlias, Optional<String> cipherProvider, Optional<String> cipherAlgorithm) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, NoSuchPaddingException, NoSuchProviderException, InvalidKeyException {
         EncryptionProcessContext options = initEncryptionOptions(myPrivateKeyAlias, theirPublicKeyAlias, cipherProvider, cipherAlgorithm);
 
         FileInputStream streamToEncrypt = new FileInputStream(fileToEncrypt);
         CipherInputStream cipherInputStream = new CipherInputStream(streamToEncrypt, options.cipher);
-
 
         //write loop
         final byte[] buf = new byte[8];
