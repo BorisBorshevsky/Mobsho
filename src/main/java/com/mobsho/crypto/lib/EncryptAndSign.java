@@ -21,7 +21,7 @@ public class EncryptAndSign {
         this.algorithmValues = values;
     }
 
-    public int encryptAndSignFile(String myPrivateKeyAlias, String myPrivateKeyPassword, String theirPublicKeyAlias, String inputFileName) {
+    public int encryptAndSignFile(String myPrivateKeyAlias, String theirPublicKeyAlias, String inputFileName) {
 
         //QAQA - Must get passwords from user.
         try {
@@ -34,13 +34,13 @@ public class EncryptAndSign {
 
 
             //Encrypt file "inputFileName" content and save in "EncryptedData". Save encryption configuration in "configFile".
-            if (algorithmValues[0].compareTo("AES/CBC/PKCS5Padding") != 0) {
-                ChiperHandler.setChipherAlgorithm(algorithmValues[0]);
-            }
+//            if (algorithmValues[0].compareTo("AES/CBC/PKCS5Padding") != 0) {
+//                ChiperHandler.setCipherAlgorithm(algorithmValues[0]);
+//            }
 
-            if (algorithmValues[1].compareTo("Default") != 0) {
-                ChiperHandler.setChipherProvider(algorithmValues[1]);
-            }
+//            if (algorithmValues[1].compareTo("Default") != 0) {
+//                ChiperHandler.setCipherProvider(algorithmValues[1]);
+//            }
 
             byte[] encodedAlgorithmParametres = this.ChiperHandler.encryptFile(inputFileName);
             if (encodedAlgorithmParametres == null) {
@@ -56,10 +56,10 @@ public class EncryptAndSign {
             }
 
             //Sign original file
-            if (algorithmValues[2].compareTo("AES/CBC/PKCS5Padding") != 0)
-                digitalSignatureHandler.setSignatureAlgorithm(algorithmValues[2]);
-            if (algorithmValues[3].compareTo("Default") != 0)
-                digitalSignatureHandler.setSignatureProvider(algorithmValues[3]);
+//            if (algorithmValues[2].compareTo("AES/CBC/PKCS5Padding") != 0)
+//                digitalSignatureHandler.setSignatureAlgorithm(algorithmValues[2]);
+//            if (algorithmValues[3].compareTo("Default") != 0)
+//                digitalSignatureHandler.setSignatureProvider(algorithmValues[3]);
             byte[] signature = digitalSignatureHandler.signData(inputFileName, myAsymetricPrivateKey);
             if (signature == null) {
                 System.out.println("Failed signing file. Exiting program.");
@@ -67,7 +67,7 @@ public class EncryptAndSign {
             }
 
             //Save all parameters in a XML configuration file
-            XMLhandler xmlhandler = new XMLhandler(encodedAlgorithmParametres, encryptedPrivateKey, signature);
+            ConfigurationManager xmlhandler = new ConfigurationManager(encodedAlgorithmParametres, encryptedPrivateKey, signature);
             xmlhandler.createConfigurationFile();
 
         } catch (Exception e1) {

@@ -1,6 +1,18 @@
 package com.mobsho.crypto.lib;
 
+import org.xml.sax.SAXException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 
 public class Main {
@@ -11,8 +23,8 @@ public class Main {
 
 
     public enum RunningType {
-        Encryptor("text1"),
-        Decryptor("text2");
+        Encryptor("encrypt"),
+        Decryptor("decrypt");
 
         private String text;
 
@@ -36,28 +48,12 @@ public class Main {
         }
     }
 
+
     public static void main(String[] args) throws Exception {
         ArrayList<String> argsSend = new ArrayList<String>();
-        argsSend.add("receive");
-        argsSend.add("data.enc");
-        argsSend.add("B/storeB.jks");
-        argsSend.add("passwordB");
-        argsSend.add("keyB");
-        argsSend.add("passwordB");
-        argsSend.add("keyA");
-
-        String[] stockArr = new String[argsSend.size()];
-        stockArr = argsSend.toArray(stockArr);
-
-        main2(stockArr);
-    }
-
-    public static void mainSend(String[] args) throws Exception {
-        ArrayList<String> argsSend = new ArrayList<String>();
-        argsSend.add("send");
+        argsSend.add("encrypt");
         argsSend.add("data.txt");
         argsSend.add("A/storeA.jks");
-        argsSend.add("passwordA");
         argsSend.add("keyA");
         argsSend.add("passwordA");
         argsSend.add("keyB");
@@ -65,7 +61,20 @@ public class Main {
         String[] stockArr = new String[argsSend.size()];
         stockArr = argsSend.toArray(stockArr);
 
-        main2(stockArr);
+
+        ArrayList<String> argsSend1 = new ArrayList<String>();
+        argsSend1.add("decrypt");
+        argsSend1.add("data1.enc");
+        argsSend1.add("B/storeB.jks");
+        argsSend1.add("keyB");
+        argsSend1.add("passwordB");
+        argsSend1.add("keyA");
+
+        String[] stockArr1 = new String[argsSend1.size()];
+        stockArr1 = argsSend1.toArray(stockArr1);
+
+//        main2(stockArr);  // encrypt
+        main2(stockArr1); //dcryptt
     }
 
     public static void main2(String[] args) {
@@ -80,8 +89,7 @@ public class Main {
         String keystore = args[2];
         String keystorePassword = args[3];
         String myPrivateKeyAlias = args[4];
-        String myPrivateKeyPassword = args[5];
-        String theirPublicKeyAlias = args[6];
+        String theirPublicKeyAlias = args[5];
 
 
         String[] algorithmValues = chooseYourOwnImpementation(1);
@@ -89,9 +97,13 @@ public class Main {
         try {
             switch (RunningType.fromString(args[0])) {
                 case Decryptor:
-                    decrypt(filename, keystore, keystorePassword, myPrivateKeyAlias, myPrivateKeyPassword, theirPublicKeyAlias);
+//                    decrypt(filename, keystore, keystorePassword, myPrivateKeyAlias, myPrivateKeyPassword, theirPublicKeyAlias);
+                        decryptNow(filename,keystore,keystorePassword,myPrivateKeyAlias,theirPublicKeyAlias);
+                    break;
                 case Encryptor:
-                    encrypt(filename, keystore, keystorePassword, myPrivateKeyAlias, myPrivateKeyPassword, theirPublicKeyAlias, algorithmValues);
+//                    encrypt(filename, keystore, keystorePassword, myPrivateKeyAlias, myPrivateKeyPassword, theirPublicKeyAlias, algorithmValues);
+                    encryptNow(filename, keystore, keystorePassword, myPrivateKeyAlias, theirPublicKeyAlias);
+                    break;
                 default:
                     System.out.println("Wrong operation mode. Please try again.");
                     System.exit(1);
@@ -117,11 +129,19 @@ public class Main {
 
     }
 
+    public static void decryptNow(String filename, String keystore, String keystorePassword, String myPrivateKeyAlias, String theirPublicKeyAlias) throws IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, ParserConfigurationException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, SAXException, NoSuchPaddingException, KeyStoreException, SignatureException {
+        Decryptor decryptor = new Decryptor(new KeyStoreHelper(keystore, keystorePassword));
+        decryptor.DecryptAndVerifyFile("data1.enc", "data1.dec", myPrivateKeyAlias, theirPublicKeyAlias);
+
+
+    }
+
+
     private static void encrypt(String filename, String keystore, String keystorePassword, String myPrivateKeyAlias, String myPrivateKeyPassword, String theirPublicKeyAlias, String[] algorithmValues) {
         int status;/*Sender - encrypt & sign*/
-			/*EncryptAndSign encSignEngine = new EncryptAndSign("ReceiverPair.jks", "password");*/
+            /*EncryptAndSign encSignEngine = new EncryptAndSign("ReceiverPair.jks", "password");*/
         EncryptAndSign encSignEngine = new EncryptAndSign(keystore, keystorePassword, algorithmValues);
-        status = encSignEngine.encryptAndSignFile(myPrivateKeyAlias, myPrivateKeyPassword, theirPublicKeyAlias, filename);
+        status = encSignEngine.encryptAndSignFile(myPrivateKeyAlias, theirPublicKeyAlias, filename);
         if (status == 0) {
             System.out.println("Program succeeded: Your file is encrypted and signed.");
             System.out.println("Output files: data.enc, configuration.xml");
@@ -130,8 +150,20 @@ public class Main {
         //todo: if error throw exception
     }
 
+    private static void encryptNow(String filename, String keystore, String keystorePassword, String myPrivateKeyAlias, String theirPublicKeyAlias) throws IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchProviderException, KeyStoreException, SignatureException, BadPaddingException, IllegalBlockSizeException, TransformerException, ParserConfigurationException {
+        Encryptor encryptor = new Encryptor(new KeyStoreHelper(keystore, keystorePassword));
+        FileOutputStream fos = new FileOutputStream("data1.enc");
+        EncryptionProcessContext option = encryptor.EncryptFile(filename, fos, myPrivateKeyAlias, theirPublicKeyAlias, Optional.empty(), Optional.empty());
+        DigitalSigner digitalSigner = new DigitalSigner();
+        option.setSignature(digitalSigner.sign(filename, option.myPrivateKey));
 
-    public static String[] chooseYourOwnImpementation(int mode) {
+        ConfigurationManager xmlhandler = new ConfigurationManager(option.cipher.getParameters().getEncoded(), utils.EncryptRsa(option.getSecretKey().getEncoded(), option.theirPublicKey), option.signature);
+        xmlhandler.createConfigurationFile();
+    }
+
+
+
+        public static String[] chooseYourOwnImpementation(int mode) {
         String s;
 
         String values[] = new String[4];

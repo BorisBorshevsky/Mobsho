@@ -34,11 +34,11 @@ public class ChipherImpl {
      * Defaults are: algorithm: "AES/CBC/PKCS5Padding", provider: default provider
      */
     //Setters
-    public void setChipherAlgorithm(String ChipherAlgorithm) {
+    public void setCipherAlgorithm(String ChipherAlgorithm) {
         this.ChipherAlgorithm = ChipherAlgorithm;
     }
 
-    public void setChipherProvider(String ChipherProvider) {
+    public void setCipherProvider(String ChipherProvider) {
         this.ChipherProvider = ChipherProvider;
     }
 
@@ -54,7 +54,7 @@ public class ChipherImpl {
 
 
     //Generate a private key ("SecretKey sKey") for encryption
-    private void generatePrivateKey() {
+    private SecretKey generatePrivateKey() {
 
         try {
             //Generate source of randomness
@@ -66,9 +66,11 @@ public class ChipherImpl {
             this.kg.init(secRand);
             sKey = kg.generateKey();
 
+            return sKey;
         } catch (NoSuchAlgorithmException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
+            return null;
         }
     }
 
@@ -84,10 +86,10 @@ public class ChipherImpl {
             c1.init(Cipher.ENCRYPT_MODE, pubKey);
             byte[] encryptedKey = c1.doFinal(encodedKey);
 
-            System.out.println("!!!!!!!!!!!!!!!!!!!! encryptedKey = " + encryptedKey);
-            System.out.println("encryptPrivateKey: PK is: " + sKey.toString());
-            System.out.println("encryptPrivateKey: Algorithm is: " + sKey.getAlgorithm());
-            System.out.println("encryptPrivateKey: getEncoded is: " + sKey.getEncoded().toString());
+//            System.out.println("!!!!!!!!!!!!!!!!!!!! encryptedKey = " + encryptedKey);
+//            System.out.println("encryptPrivateKey: PK is: " + sKey.toString());
+//            System.out.println("encryptPrivateKey: Algorithm is: " + sKey.getAlgorithm());
+//            System.out.println("encryptPrivateKey: getEncoded is: " + sKey.getEncoded().toString());
 
             return encryptedKey;
 
@@ -190,7 +192,7 @@ public class ChipherImpl {
 
         try {
             //Generate the private key used for encryption
-            this.generatePrivateKey();
+            SecretKey skey = this.generatePrivateKey();
 
             //Create a source of randomness for the initialization of the Cipher object
             SecureRandom secRandCipher = SecureRandom.getInstance("SHA1PRNG");
@@ -204,11 +206,11 @@ public class ChipherImpl {
             }
 
             //Initializes this cipher with the public key from the given certificate and a source of randomness (IV).
-            myCipher.init(Cipher.ENCRYPT_MODE, this.sKey, secRandCipher);
+            myCipher.init(Cipher.ENCRYPT_MODE, skey, secRandCipher);
 
             //Open streams to encrypt data
             fis = new FileInputStream(inputFile);
-            fos = new FileOutputStream("data.enc");
+            fos = new FileOutputStream("data1.enc");
             cis = new CipherInputStream(fis, myCipher);
 
             byte[] buffer = new byte[8];

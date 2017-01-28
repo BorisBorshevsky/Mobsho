@@ -21,7 +21,7 @@ public class DecryptAndVerify {
 	
 	public int DecryptAndVerifyFile(String myPrivateKeyAlias, String myPrivateKeyPassword, String theirPublicKeyAlias,  String encryptedFileName) {
 		//Names of files to be used for decryption and data verification
-		String decryptedData = "data.dec";
+		String decryptedData = "data2.dec";
 		String configurationFile = "configuration.xml";
 		//Load pair of Keys
 		//QAQA - Must get passwords from user.
@@ -33,10 +33,10 @@ public class DecryptAndVerify {
 			PublicKey theirPublicKey = keyStoreHelper.getPublicKey(theirPublicKeyAlias);
 			
 			//Extract parameters from the XML configuration file
-        	XMLhandler xmlhandler = new XMLhandler(null, null, null);
-        	xmlhandler.parseConfigurationFile(configurationFile);
+        	ConfigurationManager xmlhandler = new ConfigurationManager();
+        	xmlhandler.parseConfigurationFile();
         	byte[] encodedAlgorithmParametres = xmlhandler.getAlgorithmParameters();
-        	byte[] encryptedPrivateKey = xmlhandler.getEncryptedPrivateKey();
+        	byte[] encryptedPrivateKey = xmlhandler.getEncryptedSecretKey();
         	byte[] digitalSignature = xmlhandler.getDigitalSignature();
         	
 			//Decrypt/extract private key
