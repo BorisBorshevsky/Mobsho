@@ -17,10 +17,6 @@ import java.util.Optional;
 
 public class Main {
 
-    /**
-     * @param args: <Operation mode> <data filename> <keystore filename> <keystore password> <private key alias> <public key alias>
-     */
-
 
     private enum OperationType {
         Encrypt("encrypt"),
@@ -48,34 +44,6 @@ public class Main {
         }
     }
 
-
-//    public static void main(String[] args) throws Exception {
-//        ArrayList<String> argsSend = new ArrayList<String>();
-//        argsSend.add("encrypt");
-//        argsSend.add("data.txt");
-//        argsSend.add("A/storeA.jks");
-//        argsSend.add("keyA");
-//        argsSend.add("passwordA");
-//        argsSend.add("keyB");
-//
-//        String[] stockArr = new String[argsSend.size()];
-//        stockArr = argsSend.toArray(stockArr);
-//
-//
-//        ArrayList<String> argsSend1 = new ArrayList<String>();
-//        argsSend1.add("decrypt");
-//        argsSend1.add("data1.enc");
-//        argsSend1.add("B/storeB.jks");
-//        argsSend1.add("keyB");
-//        argsSend1.add("passwordB");
-//        argsSend1.add("keyA");
-//
-//        String[] stockArr1 = new String[argsSend1.size()];
-//        stockArr1 = argsSend1.toArray(stockArr1);
-//
-//        main2(stockArr);  // encrypt
-////        main2(stockArr1); //dcryptt
-//    }
 
     public static void main(String[] args) {
 
@@ -114,11 +82,9 @@ public class Main {
         }
     }
 
-    private static void decryptNow(String filename, String outputFile, String keystore, String keystorePassword, String myPrivateKeyAlias, String theirPublicKeyAlias) throws IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, ParserConfigurationException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, SAXException, NoSuchPaddingException, KeyStoreException, SignatureException {
+    private static void decryptNow(String filename, String outputFile, String keystore, String keystorePassword, String myPrivateKeyAlias, String theirPublicKeyAlias) throws Exception {
         Decryptor decryptor = new Decryptor(new KeyStoreHelper(keystore, keystorePassword));
         decryptor.DecryptAndVerifyFile(filename, outputFile, myPrivateKeyAlias, theirPublicKeyAlias);
-
-
     }
 
     private static void encryptNow(String filename, String outputFile, String keystore, String keystorePassword, String myPrivateKeyAlias, String theirPublicKeyAlias) throws IOException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchProviderException, KeyStoreException, SignatureException, BadPaddingException, IllegalBlockSizeException, TransformerException, ParserConfigurationException {
