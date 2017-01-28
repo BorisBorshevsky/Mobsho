@@ -52,7 +52,6 @@ public class ConfigurationManager {
     }
 
     public void createConfigurationFile() throws ParserConfigurationException, TransformerException {
-        Json
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
