@@ -12,23 +12,26 @@ import java.util.Optional;
 /**
  * Created by boris on 1/28/17.
  */
-public class DigitalSigner {
-    private String signAlgorithm;
-    private Optional<String> signProvider;
+class DigitalSigner {
+    public static final String DEFAULT_SIGNATURE_ALGO = "SHA1withRSA";
+    private final String signAlgorithm;
+    private String signProvider;
 
     public DigitalSigner() {
         this(Optional.empty(), Optional.empty());
     }
 
-    public DigitalSigner(Optional<String> signAlgorithm, Optional<String> signProvider) {
-        this.signAlgorithm = signAlgorithm.orElse("SHA1withRSA");
-        this.signProvider = signProvider;
+    private DigitalSigner(Optional<String> signAlgorithm, Optional<String> signProvider) {
+        this.signAlgorithm = signAlgorithm.orElse(DEFAULT_SIGNATURE_ALGO);
+        if (signProvider.isPresent()) {
+            this.signProvider = signProvider.get();
+        }
     }
 
     public byte[] sign(String inputFile, PrivateKey privateKey) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, IOException, SignatureException {
         Signature signature;
-        if (this.signProvider.isPresent()) {
-            signature = Signature.getInstance(this.signAlgorithm, this.signProvider.get());
+        if (this.signProvider != null) {
+            signature = Signature.getInstance(this.signAlgorithm, this.signProvider);
         } else {
             signature = Signature.getInstance(this.signAlgorithm);
         }
@@ -50,7 +53,4 @@ public class DigitalSigner {
         return signature.sign();
     }
 
-    public boolean verify() {
-        return true;
-    }
 }

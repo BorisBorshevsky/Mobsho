@@ -10,19 +10,18 @@ import java.util.Optional;
 /**
  * Created by boris on 1/27/17.
  */
-public class Encryptor {
-//		this.keyStoreHelper = new KeyStoreHelper(keyStoreFilename, keyStorePassword);
+class Encryptor {
 
-    KeyStoreHelper keyStoreHelper;
+    private final KeyStoreHelper keyStoreHelper;
 
     public Encryptor(KeyStoreHelper keyStoreHelper) {
         this.keyStoreHelper = keyStoreHelper;
     }
 
 
-    static final String DEFAULT_ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String DEFAULT_ALGORITHM = "AES/CBC/PKCS5Padding";
 
-    private EncryptionProcessContext initEncryptionOptions(String myPrivateKeyAlias, String theirPublicKeyAlias, Optional<String> cipherProvider, Optional<String> cipherAlgorithm) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, UnrecoverableKeyException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+    private EncryptionProcessContext initEncryptionOptions(String myPrivateKeyAlias, String theirPublicKeyAlias, Optional<String> cipherProvider, Optional<String> cipherAlgorithm) throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, UnrecoverableKeyException, NoSuchProviderException, NoSuchPaddingException, InvalidKeyException {
         PublicKey theirPublicKey = keyStoreHelper.getPublicKey(theirPublicKeyAlias);
         PrivateKey myPrivateKey = keyStoreHelper.getPrivateKey(myPrivateKeyAlias);
 
@@ -35,31 +34,15 @@ public class Encryptor {
             myCipher = Cipher.getInstance(cipherAlgorithm.orElse(DEFAULT_ALGORITHM));
         }
 
-        if (isIvRequired(cipherAlgorithm.orElse(DEFAULT_ALGORITHM))) {
-//            IvParameterSpec iv = createIV(myCipher.getBlockSize(), Optional.empty());
-            SecureRandom secRandCipher = SecureRandom.getInstance("SHA1PRNG");
-            secRandCipher.setSeed(1024);
-            myCipher.init(Cipher.ENCRYPT_MODE, aesKey, secRandCipher);
-//            myCipher.init(Cipher.ENCRYPT_MODE, aesKey, iv);
-//            return new EncryptionProcessContext(myCipher, theirPublicKey, myPrivateKey, aesKey, Optional.of(iv));
-            return new EncryptionProcessContext(myCipher, theirPublicKey, myPrivateKey, aesKey, Optional.empty());
-        } else {
-            return new EncryptionProcessContext(myCipher, theirPublicKey, myPrivateKey, aesKey, Optional.empty());
-        }
-
-        //Initializes this cipher with the public key from the given certificate and a source of randomness (IV).
-
+        SecureRandom secRandCipher = SecureRandom.getInstance("SHA1PRNG");
+        secRandCipher.setSeed(1024);
+        myCipher.init(Cipher.ENCRYPT_MODE, aesKey, secRandCipher);
+        return new EncryptionProcessContext(myCipher, theirPublicKey, myPrivateKey, aesKey, Optional.empty());
     }
 
-    private boolean isIvRequired(String algorithm) {
-        return true;
-    }
 
     public EncryptionProcessContext EncryptFile(String fileToEncrypt, OutputStream output, String myPrivateKeyAlias, String theirPublicKeyAlias, Optional<String> cipherProvider, Optional<String> cipherAlgorithm) throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException, NoSuchPaddingException, NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException {
         EncryptionProcessContext options = initEncryptionOptions(myPrivateKeyAlias, theirPublicKeyAlias, cipherProvider, cipherAlgorithm);
-
-//        CipherOutputStream encryptedStream = new CipherOutputStream(output, options.cipher);
-//        FileInputStream streamToEncrypt = new FileInputStream(fileToEncrypt);
 
         FileInputStream streamToEncrypt = new FileInputStream(fileToEncrypt);
         CipherInputStream cipherInputStream = new CipherInputStream(streamToEncrypt, options.cipher);
@@ -93,13 +76,6 @@ public class Encryptor {
         keyGenerator.init(secRand);
 
         return keyGenerator.generateKey();
-    }
-
-    private IvParameterSpec createIV(final int ivSizeBytes, final Optional<SecureRandom> rng) {
-        final byte[] iv = new byte[ivSizeBytes];
-        final SecureRandom theRNG = rng.orElse(new SecureRandom());
-        theRNG.nextBytes(iv);
-        return new IvParameterSpec(iv);
     }
 
 }

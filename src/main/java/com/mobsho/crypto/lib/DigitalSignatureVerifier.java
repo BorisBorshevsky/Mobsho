@@ -8,9 +8,9 @@ import java.security.*;
 /**
  * Created by boris on 1/28/17.
  */
-public class DigitalSignatureVerifier {
+class DigitalSignatureVerifier {
 
-    public static void verifySignature(byte[] signature, String inputFile, PublicKey theirPublicKey) throws NoSuchAlgorithmException, InvalidKeyException, IOException, SignatureException {
+    public static void verifySignature(byte[] signature, String inputFile, PublicKey theirPublicKey) throws Exception {
         //Initialize the Signature Object for Verification
         Signature sig;
         //Get a Signature Object
@@ -34,14 +34,8 @@ public class DigitalSignatureVerifier {
 
         //Verify the Signature
         boolean verifies = sig.verify(signature);
-        System.out.println("******************************");
-        if (verifies) {
-            System.out.println("Signature is valid! :)");
-        } else {
-            System.out.println("Signature is NOT valid NOT valid NOT valid");
+        if (!verifies) {
+            throw new Exception("Signature is NOT valid");
         }
-        System.out.println("******************************");
-
-
     }
 }

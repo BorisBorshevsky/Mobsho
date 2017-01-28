@@ -10,72 +10,78 @@ import java.security.*;
 import java.security.cert.CertificateException;
 
 
-public class Decryptor {
-    static final String DEFAULT_ALGORITHM = "AES/CBC/PKCS5Padding";
+class Decryptor {
+    private static final String DEFAULT_ALGORITHM = "AES/CBC/PKCS5Padding";
 
-
-    KeyStoreHelper keyStoreHelper;
+    private final KeyStoreHelper keyStoreHelper;
 
     public Decryptor(KeyStoreHelper keyStoreHelper) {
         this.keyStoreHelper = keyStoreHelper;
     }
 
 
-    public void DecryptAndVerifyFile(String encryptedFileName, String outputFile, String myPrivateKeyAlias, String theirPublicKeyAlias) throws UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, ParserConfigurationException, SAXException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, SignatureException {
+    public void DecryptAndVerifyFile(String encryptedFileName, String outputFile, String myPrivateKeyAlias, String theirPublicKeyAlias) throws Exception {
 
         PrivateKey myPrivateKey = keyStoreHelper.getPrivateKey(myPrivateKeyAlias);
         PublicKey theirPublicKey = keyStoreHelper.getPublicKey(theirPublicKeyAlias);
 
 
         //Extract parameters from the XML configuration file
-        ConfigurationManager xmlhandler = new ConfigurationManager();
-        xmlhandler.parseConfigurationFile();
-        byte[] encodedAlgorithmParametres = xmlhandler.getAlgorithmParameters();
-        byte[] encryptedSecretKey = xmlhandler.getEncryptedSecretKey();
-        byte[] digitalSignature = xmlhandler.getDigitalSignature();
+        ConfigurationManager configManager = new ConfigurationManager();
+        configManager.parseConfigurationFile();
+        byte[] encodedAlgorithmParameters = configManager.getAlgorithmParameters();
+        byte[] encryptedSecretKey = configManager.getEncryptedSecretKey();
+//
 
         //Decrypt/extract private key
-        byte[] secretKeyBytes = utils.DecryptRsa(encryptedSecretKey, myPrivateKey);
+        byte[] secretKeyBytes = Utils.DecryptRsa(encryptedSecretKey, myPrivateKey);
         SecretKeySpec secret = new SecretKeySpec(secretKeyBytes, "AES");
 
-        this.decryptFile(encryptedFileName, outputFile, encodedAlgorithmParametres, secret);
+
+        //decrypt file
+        this.decryptFile(encryptedFileName, outputFile, encodedAlgorithmParameters, secret);
+
 
         //Verify file by signature
+        byte[] digitalSignature = configManager.getDigitalSignature();
         DigitalSignatureVerifier.verifySignature(digitalSignature, outputFile, theirPublicKey);
     }
 
-    public void decryptFile(String encryptedFile, String decryptedOutputFile, byte[] encodedAlgParams, SecretKey sKey) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+    private void decryptFile(String encryptedFile, String decryptedOutputFile, byte[] encodedAlgParams, SecretKey sKey) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        CipherInputStream cis = null;
+        try {
 
-        FileInputStream fis;
-        FileOutputStream fos;
-        CipherInputStream cis;
-        AlgorithmParameters algParams;
-        Cipher myCipher;
+            AlgorithmParameters algParams;
+            Cipher myCipher;
 
 
-        algParams = AlgorithmParameters.getInstance("AES");
-        // initialize with parameter encoding from above
-        algParams.init(encodedAlgParams);
-        myCipher = Cipher.getInstance(DEFAULT_ALGORITHM);
-        myCipher.init(Cipher.DECRYPT_MODE, sKey, algParams);
+            algParams = AlgorithmParameters.getInstance("AES");
+            // initialize with parameter encoding from above
+            algParams.init(encodedAlgParams);
+            myCipher = Cipher.getInstance(DEFAULT_ALGORITHM);
+            myCipher.init(Cipher.DECRYPT_MODE, sKey, algParams);
 
-        fis = new FileInputStream(encryptedFile);
-        fos = new FileOutputStream(decryptedOutputFile);
-        cis = new CipherInputStream(fis, myCipher);
+            fis = new FileInputStream(encryptedFile);
+            fos = new FileOutputStream(decryptedOutputFile);
+            cis = new CipherInputStream(fis, myCipher);
 
-        byte[] buffer = new byte[8];
-        int i = cis.read(buffer);
+            byte[] buffer = new byte[8];
+            int i = cis.read(buffer);
 
-        //write loop
-        while (i != -1) {
-            fos.write(buffer, 0, i);
-            i = cis.read(buffer);
+            //write loop
+            while (i != -1) {
+                fos.write(buffer, 0, i);
+                i = cis.read(buffer);
+            }
+        } finally {
+            if (fis != null) fis.close();
+            if (fos != null)fos.close();
+            if (cis != null)cis.close();
+
         }
-
         //Close resources
-        fis.close();
-        fos.close();
-        cis.close();
 
 
     }

@@ -12,7 +12,7 @@ import java.security.PublicKey;
 /**
  * Created by boris on 1/28/17.
  */
-public class utils {
+class Utils {
 
     public static byte[] EncryptRsa(byte[] contentToEncrypt, Key key) throws BadPaddingException, IllegalBlockSizeException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("RSA");

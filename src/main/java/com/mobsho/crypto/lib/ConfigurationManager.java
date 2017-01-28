@@ -27,7 +27,7 @@ public class ConfigurationManager {
     private byte[] encryptedPrivateKey;
     private byte[] digitalSignature;
 
-    public static final String CONFIGURATION_XML = "configuration.xml";
+    private static final String CONFIGURATION_XML = "conf.xml";
 
     public ConfigurationManager() {
     }
@@ -51,8 +51,8 @@ public class ConfigurationManager {
         return this.digitalSignature;
     }
 
-    public int createConfigurationFile() throws ParserConfigurationException, TransformerException {
-
+    public void createConfigurationFile() throws ParserConfigurationException, TransformerException {
+        Json
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -87,18 +87,14 @@ public class ConfigurationManager {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new File("configuration.xml"));
+        StreamResult result = new StreamResult(new File(CONFIGURATION_XML));
 
         transformer.transform(source, result);
-
-
-        return 1;
     }
 
 
     public ConfigurationManager parseConfigurationFile() throws ParserConfigurationException, IOException, SAXException {
         return parseConfigurationFile(CONFIGURATION_XML);
-
     }
 
     public ConfigurationManager parseConfigurationFile(String fileName) throws ParserConfigurationException, IOException, SAXException {
@@ -125,9 +121,7 @@ public class ConfigurationManager {
 
     }
 
-
     private static String getValue(String tag, Element element) {
-
         NodeList nodes = element.getElementsByTagName(tag).item(0).getChildNodes();
         Node node = nodes.item(0);
         return node.getNodeValue();
